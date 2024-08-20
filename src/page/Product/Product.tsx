@@ -5,12 +5,13 @@ import {
   useDeleteProductMutation,
   useGetCategoryQuery,
   useGetProductQuery,
+  useProductUpdateMutation,
 } from "../../redux/api/baseApi";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Swal from "sweetalert2";
 import Modal from "../../components/Model/Modal";
 import { modelClose, modelOpen } from "../../helpers";
-import { GiToaster } from "react-icons/gi";
+// import { GiToaster } from "react-icons/gi";
 
 type Inputs = {
   title?: string;
@@ -21,6 +22,17 @@ type Inputs = {
   rating?: number;
   description?: string;
 };
+
+type TProductUpdate ={
+  productId?:string;
+  title?:string;
+  image?:string;
+  categoryId?:string;
+  price?:number;
+  quantity?:number;
+  rating?:number;
+  description?:string;
+}
 
 export const Product = () => {
   const {
@@ -41,6 +53,7 @@ export const Product = () => {
     useGetCategoryQuery(undefined);
   const [deleteProduct, { isError: deleteError }] = useDeleteProductMutation();
   // const [updateProductInfo, setUpdateProductInf] = useState({});
+  const [productUpdateHandle] = useProductUpdateMutation();
 
   if (isError || isLoading || categoryLoading) {
     return <div>Loading...</div>;
@@ -48,6 +61,7 @@ export const Product = () => {
   if (deleteError) {
     return <div>Error...</div>;
   }
+  
 
   //   console.log("products", products);
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -112,22 +126,35 @@ export const Product = () => {
     const rating = e.target.rating.value;
     const description = e.target.description.value;
 
-    const updateProductInfo = {
+    const updateProduct:TProductUpdate = {
+      productId : updateProductInfo?._id,
       title,
       image,
       categoryId: category,
-      price,
-      quantity,
-      rating,
+      price: Number(price),
+      quantity: Number(quantity),
+      rating: Number(rating),
       description,
     };
 
-    console.log("product Up: ",updateProductInfo);
+    const res = await productUpdateHandle(updateProduct).unwrap();
+    if(res.data){
+      // modelClose(updateProductModalRef, updateProductFormRef);
+      modelClose(updateProductModalRef, updateProductFormRef);
+      alert("Product Updated Successfully");
+      
+    }else{
+      alert("Product Update Failed");
+    }
+   
+    
+
+    // console.log("product Up: ",updateProductInfo);
     
 
   }
 
-  console.log("updateProductInfo", updateProductInfo);
+  // console.log("updateProductInfo", updateProductInfo);
   
 
   return (
@@ -481,7 +508,7 @@ export const Product = () => {
                     <input
                       type="text"
                       name="title"
-                      value={updateProductInfo?.title}
+                      defaultValue={updateProductInfo?.title}
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       placeholder="Enter Title"
                     />
@@ -502,7 +529,7 @@ export const Product = () => {
                       type="text"
                       name="image"
                       
-                      value={updateProductInfo?.image}
+                      defaultValue={updateProductInfo?.image}
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       placeholder="Enter image url"
                     />
@@ -553,7 +580,7 @@ export const Product = () => {
                     <input
                       type="number"
                       name="price"
-                      value={updateProductInfo?.price}
+                      defaultValue={updateProductInfo?.price}
                       
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       placeholder="Enter price"
@@ -574,7 +601,7 @@ export const Product = () => {
                     <input
                       type="number"
                       name="quantity"
-                      value={updateProductInfo?.quantity}
+                      defaultValue={updateProductInfo?.quantity}
                      
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       placeholder="Enter quantity"
@@ -595,7 +622,7 @@ export const Product = () => {
                     <input
                       type="number"
                       name="rating"
-                      value={updateProductInfo?.rating}
+                      defaultValue={updateProductInfo?.rating}
                      
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       placeholder="Enter rating"
@@ -615,7 +642,7 @@ export const Product = () => {
                   <div className="mt-2 w-full">
                     <textarea
                       name="description"
-                      value={updateProductInfo?.description}
+                      defaultValue={updateProductInfo?.description}
                      
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       placeholder="Enter category"

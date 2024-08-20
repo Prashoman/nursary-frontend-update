@@ -1,5 +1,15 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+type TProductUpdate ={
+  productId?:string;
+  title?:string;
+  image?:string;
+  categoryId?:string;
+  price?:number;
+  quantity?:number;
+  rating?:number;
+  description?:string;
+}
 
 export const baseApi = createApi({
   reducerPath: "baseApi",
@@ -71,8 +81,35 @@ export const baseApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags:["Product"]
+    }),
+    productUpdate : builder.mutation({
+
+      query:(productInfo)=>{
+
+        const id = productInfo.productId;
+
+
+        const productUp = {
+          categoryId:productInfo.categoryId,
+          title:productInfo.title,
+          price:productInfo.price,
+          quantity:productInfo.quantity,
+          rating:productInfo.rating,
+          image:productInfo.image,
+          description:productInfo.description
+        };
+
+        console.log("productUp in redux:",productUp);	
+        
+        return{
+          url:`/product/products/${id}`,
+          method:"PATCH",
+          body:productUp
+        }
+      },
+      invalidatesTags:["Product"]
     })
   }),
 });
 
-export const { useGetCategoryQuery, useAddCategoryMutation, useDeleteCategoryMutation, useUpdateCategoryMutation, useGetProductQuery, useAddProductMutation, useDeleteProductMutation } = baseApi;
+export const { useGetCategoryQuery, useAddCategoryMutation, useDeleteCategoryMutation, useUpdateCategoryMutation, useGetProductQuery, useAddProductMutation, useDeleteProductMutation, useProductUpdateMutation } = baseApi;
