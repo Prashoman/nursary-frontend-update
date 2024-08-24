@@ -8,37 +8,41 @@ import { useRef, useState } from "react";
 import HeroSection from "../../components/HeroSection/HeroSection";
 import About from "../../components/About/About";
 import ImageGallery from "../../components/ImageGallery/ImageGallery";
+import HomeProduct from "../../components/HomeProduct/HomeProduct";
 
 const Home = () => {
   const [categoryName, setCategoryName] = useState("");
   const { data: category, isLoading, error } = useGetCategoryQuery(undefined);
-  const [categoryInfo] = useAddCategoryMutation();
-  const modalRef = useRef<HTMLDivElement>(null);
-  const categoryForm = useRef<HTMLFormElement>(null);
+  console.log('data:',category);
+  
+  // const [categoryInfo] = useAddCategoryMutation();
+  // const modalRef = useRef<HTMLDivElement>(null);
+  // const categoryForm = useRef<HTMLFormElement>(null);
 
-  const toggleModal = () => {
-    setCategoryName("");
-    categoryForm.current?.reset();
-    modalRef.current?.classList.toggle("hidden");
-  };
+  // const toggleModal = () => {
+  //   setCategoryName("");
+  //   categoryForm.current?.reset();
+  //   modalRef.current?.classList.toggle("hidden");
+  // };
 
-  if (!error && isLoading) {
-    return <div>Loading...</div>;
-  }
-  console.log(category.data);
+  // if (!error && isLoading) {
+  //   return <div>Loading...</div>;
+  // }
+  // console.log(category.data);
 
-  const handaleCategorySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const categoryInsertData = await categoryInfo({ categoryName });
-    if (categoryInsertData) {
-      toggleModal();
-    }
-  };
+  // const handaleCategorySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const categoryInsertData = await categoryInfo({ categoryName });
+  //   if (categoryInsertData) {
+  //     toggleModal();
+  //   }
+  // };
 
   return (
     <>
     <HeroSection/>
     <About/>
+    <HomeProduct/>
     <ImageGallery/>
     </>
     

@@ -13,7 +13,7 @@ type TProductUpdate ={
 
 export const baseApi = createApi({
   reducerPath: "baseApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api/v1" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://nusary-backend.vercel.app/api/v1" }),
   tagTypes:["Category","Product"],
   endpoints: (builder) => ({
     getCategory: builder.query({
@@ -60,7 +60,7 @@ export const baseApi = createApi({
     }),
     getProduct : builder.query({
       query:()=>({
-        url:`/product/products`,
+        url:`/product/products?page=1&limit=100`,
         method:"GET"
       }),
       providesTags:["Product"]

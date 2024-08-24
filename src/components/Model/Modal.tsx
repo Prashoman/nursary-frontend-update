@@ -24,7 +24,7 @@ const Modal = ({
 }:ModalType) => {
   return (
     <>
-      <dialog ref={modalRef} className="modal bg-primary/10 relative">
+      <dialog ref={modalRef} className="modal bg-primary/10">
         <div className="modal-box bg-white w-10/12 max-w-[40rem]">
           <div className="border-b border-gray-500 pb-4">
             <h3 className="font-medium text-20 text-left">{title}</h3>

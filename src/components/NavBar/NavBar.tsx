@@ -95,7 +95,7 @@ export default function NavBar() {
                 </li>
                 <li>
                   <Link
-                    to={"/product"}
+                    to={"/products"}
                     className="text-white hover:text-[#F2BF4A] text-[16px] font-[500] hover:text-[17px] transition-all"
                   >
                     Product
