@@ -1,19 +1,31 @@
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { useGetCategoryQuery, useGetProductQuery } from "../../redux/api/baseApi";
+import { TCategories, TProducts } from "../../helpers";
+import { useState } from "react";
+
 
 
 const HomeProduct = () =>{
+  const [selectedCategories, setSelectedCategory] = useState("");
+  
+
+
     const{data:category} = useGetCategoryQuery(undefined);
     const{data:products} = useGetProductQuery(undefined);
+
+   
    
     
   return (
   <>
    <section className="w-full px-4 lg:px-20 bg-white">
+      <div>
+        <h1 className=" text-center font-medium text-green-700 text-2xl ">Our Products</h1>
+      </div>
         <div className="flex items-center justify-center flex-wrap gap-5 pt-4 pb-16">
           <div
-            // onClick={() => setSelectedCategory(null)}
+            onClick={() => setSelectedCategory(null)}
             // ${  selectedCategory === null ? categoryColor : "" }
             className={` w-[45%] lg:w-[18%] font-serif text-[14px] lg:text-xl border border-yellow-500 py-1 px-3 text-center rounded-lg cursor-pointer hover:bg-[#690213] hover:text-white`}
           >
@@ -21,10 +33,10 @@ const HomeProduct = () =>{
           </div>
 
           {category?.data?.length > 0 ? (
-            category?.data?.map((cat: any, index: number) => (
+            category?.data?.map((cat:TCategories , index: number) => (
               <div
                 key={index}
-                // onClick={() => setSelectedCategory(cat.id)}
+                onClick={() => setSelectedCategory(cat.id)}
                 // ${ selectedCategory === cat.id ? categoryColor : ""}
                 className={` w-[45%] lg:w-[18%] font-serif text-[14px] lg:text-xl border border-yellow-500 py-1 px-3 text-center rounded-lg cursor-pointer hover:bg-[#690213] hover:text-white`}
               >
@@ -37,7 +49,7 @@ const HomeProduct = () =>{
         </div>
         <div className="flex items-center flex-wrap gap-7">
           {products?.data?.length > 0 ? (
-            products?.data?.map((item: any, index: number) => {
+            products?.data?.map((item: TProducts, index: number) => {
               
                 return (
                   <div
@@ -50,9 +62,7 @@ const HomeProduct = () =>{
                         <img
                           src={item.image}
                           className="w-full h-[120px] lg:h-[200px]"
-                        //   width={150}
-                        //   height={150}
-                          alt={item.name}
+                          alt={item.title}
                         />
                       </div>
                     </Link>

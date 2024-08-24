@@ -1,19 +1,19 @@
-import { Category } from "../../components/Category/Category";
-import {
-  useAddCategoryMutation,
-  useGetCategoryQuery,
-} from "../../redux/api/baseApi";
-import { Model } from "../../components/Model/Model";
-import { useRef, useState } from "react";
+// import { Category } from "../../components/Category/Category";
+// import {
+//   useAddCategoryMutation,
+//   useGetCategoryQuery,
+// } from "../../redux/api/baseApi";
+// import { Model } from "../../components/Model/Model";
+// import { useRef, useState } from "react";
 import HeroSection from "../../components/HeroSection/HeroSection";
 import About from "../../components/About/About";
 import ImageGallery from "../../components/ImageGallery/ImageGallery";
 import HomeProduct from "../../components/HomeProduct/HomeProduct";
 
 const Home = () => {
-  const [categoryName, setCategoryName] = useState("");
-  const { data: category, isLoading, error } = useGetCategoryQuery(undefined);
-  console.log('data:',category);
+  // const [categoryName, setCategoryName] = useState("");
+  // const { data: category, isLoading, error } = useGetCategoryQuery(undefined);
+  // console.log('data:',category);
   
   // const [categoryInfo] = useAddCategoryMutation();
   // const modalRef = useRef<HTMLDivElement>(null);
