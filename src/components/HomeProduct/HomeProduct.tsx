@@ -2,22 +2,34 @@ import { HiOutlineShoppingCart } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { useGetCategoryQuery, useGetProductQuery } from "../../redux/api/baseApi";
 import { TCategories, TProducts } from "../../helpers";
-import { useDispatch } from "react-redux";
+
 import { addToCart } from "../../redux/cart/cartSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
+import { toast } from "react-toastify";
 
 
 
 
 const HomeProduct = () =>{
   // const [selectedCategories, setSelectedCategory] = useState("");
-  const dispatch = useDispatch()
-  
+  const dispatch = useAppDispatch()
+  const cartProduct = useAppSelector((state: RootState) => state.cart.cart) as TProducts[];
 
 
     const{data:category} = useGetCategoryQuery(undefined);
     const{data:products} = useGetProductQuery(undefined);
 
-   
+    const handleAddtoCart = (item:TProducts) => {
+      const mainProductQuantity:number = products?.data?.find((mItem:TProducts) => mItem._id === item?._id)?.quantity;
+      const cartProductQuantity:number | undefined = cartProduct?.find((cItem:TProducts) => cItem._id === item?._id)?.quantity;
+      if(cartProductQuantity === mainProductQuantity){
+        toast.error("You can't add more than stock quantity");
+        return;
+      }
+      dispatch(addToCart(item))
+      toast.success("Product added to cart")
+    }
    
     
   return (
@@ -82,7 +94,7 @@ const HomeProduct = () =>{
                             <p className="text-[12px] lg:text-[16px] font-serif">
                             stock: {item.quantity}
                             </p>
-                            <small className="bg-[#690213] text-white font-serif rounded-xl py-1 px-2 text-xs absolute bottom-[37%] left-2">
+                            <small className="bg-green-600 text-white font-serif rounded-xl py-1 px-2 text-xs absolute bottom-[85%] lg:bottom-[37%] left-2">
                               {item?.categoryId?.categoryName}
                             </small>
                           </div>
@@ -91,12 +103,11 @@ const HomeProduct = () =>{
                       </Link>
                       <div className="pt-2">
                         <button
-                        onClick={()=> dispatch({ type:addToCart, payload:item})}
-                        //   onClick={(e) => handleAddToCart(item?.food_id, e)}
-                          className="bg-[#690213] text-white py-2 px-4 rounded-full flex items-center justify-center gap-2 w-full h-10 hover:bg-gray-400 hover:text-[#690213] transition-all"
+                        onClick={()=> handleAddtoCart(item)}
+                        className="bg-green-950 text-white py-2 px-4 rounded-full flex items-center justify-center gap-2 w-full  lg:h-10 hover:bg-green-600 hover:text-white transition-all"
                         >
-                          <HiOutlineShoppingCart className="w-6 h-6" />
-                          <span className="text-xs lg:text-sm">
+                          <HiOutlineShoppingCart className="w-4 h-4 lg:w-6 lg:h-6" />
+                          <span className="text-xs lg:text-xl">
                             Add to Cart
                           </span>
                         </button>

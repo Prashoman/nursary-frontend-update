@@ -41,3 +41,7 @@ export type TProducts = {
   updatedAt: string;
   __v?: number;
 };
+
+export const totalAmount = (cart: TProducts[]) => {
+  return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+}

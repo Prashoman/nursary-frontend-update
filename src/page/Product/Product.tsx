@@ -10,7 +10,8 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form";
 import Swal from "sweetalert2";
 import Modal from "../../components/Model/Modal";
-import { modelClose, modelOpen } from "../../helpers";
+import { modelClose, modelOpen, TCategories, TProducts } from "../../helpers";
+import { toast } from "react-toastify";
 // import { GiToaster } from "react-icons/gi";
 
 type Inputs = {
@@ -24,10 +25,11 @@ type Inputs = {
 };
 
 type TProductUpdate ={
+  _id:string;
   productId?:string;
   title?:string;
   image?:string;
-  categoryId?:string;
+  categoryId?:TCategories;
   price?:number;
   quantity?:number;
   rating?:number;
@@ -45,7 +47,7 @@ export const Product = () => {
   const productFormRef = useRef<HTMLFormElement>(null);
   const updateProductModalRef = useRef<HTMLDialogElement>(null);
   const updateProductFormRef = useRef<HTMLFormElement>(null);
-  const [updateProductInfo, setUpdateProductInfo] = useState<object | null>(null);
+  const [updateProductInfo, setUpdateProductInfo] = useState<TProductUpdate | null>(null);
   // const productUpdateModalRef = useRef<HTMLDivElement>(null);
   const { data: products, isError, isLoading } = useGetProductQuery(undefined);
   const [productInfoHandle] = useAddProductMutation();
@@ -78,13 +80,16 @@ export const Product = () => {
       description,
     };
     const insertProduct = await productInfoHandle(productInfo);
-    console.log("insertProduct", insertProduct);
+    // console.log("insertProduct", insertProduct);
 
     if (insertProduct) {
       // toggleModal();
+      toast.success("Product Added Successfully");
       modelClose(productModalRef, productFormRef);
       reset();
-      // Toaster.success("Product Added Successfully");
+    
+    }else{
+      toast.error("Product Added Failed");
     }
     // console.log("productInfo", productInfo);
   };
@@ -112,51 +117,46 @@ export const Product = () => {
     });
   };
 
-  const handleProductEdit = (item: object | null) => {
+  const handleProductEdit = (item: TProductUpdate | null) => {
     setUpdateProductInfo(item);
     modelOpen(updateProductModalRef);
   };
   const handleUpdateProductSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const title = e.target.title.value;
-    const image = e.target.image.value;
-    const category = e.target.category.value;
-    const price = e.target.price.value;
-    const quantity = e.target.quantity.value;
-    const rating = e.target.rating.value;
-    const description = e.target.description.value;
-
-    const updateProduct:TProductUpdate = {
-      productId : updateProductInfo?._id,
+  
+    const form = e.target as HTMLFormElement;
+  
+    const title = (form.elements.namedItem('title') as HTMLInputElement)?.value;
+    const image = (form.elements.namedItem('image') as HTMLInputElement)?.value;
+    const category = (form.elements.namedItem('category') as HTMLInputElement)?.value;
+    const price = Number((form.elements.namedItem('price') as HTMLInputElement)?.value);
+    const quantity = Number((form.elements.namedItem('quantity') as HTMLInputElement)?.value);
+    const rating = Number((form.elements.namedItem('rating') as HTMLInputElement)?.value);
+    const description = (form.elements.namedItem('description') as HTMLInputElement)?.value;
+  
+    const updateProduct = {
+      productId: updateProductInfo?._id,
       title,
       image,
       categoryId: category,
-      price: Number(price),
-      quantity: Number(quantity),
-      rating: Number(rating),
+      price,
+      quantity,
+      rating,
       description,
     };
-
-    const res = await productUpdateHandle(updateProduct).unwrap();
-    if(res.data){
-      // modelClose(updateProductModalRef, updateProductFormRef);
-      modelClose(updateProductModalRef, updateProductFormRef);
-      alert("Product Updated Successfully");
-      
-    }else{
-      alert("Product Update Failed");
-    }
-   
-    
-
-    // console.log("product Up: ",updateProductInfo);
-    
-
-  }
-
-  // console.log("updateProductInfo", updateProductInfo);
   
-
+    try {
+      const res = await productUpdateHandle(updateProduct).unwrap();
+      if (res.data) {
+        modelClose(updateProductModalRef, updateProductFormRef);
+        toast.success("Product Updated Successfully");
+      } else {
+        toast.error("Product Update Failed");
+      }
+    } catch (error) {
+      toast.error("Product Update Failed");
+    }
+  };
   return (
     <>
       <div className="py-10 px-20">
@@ -209,7 +209,7 @@ export const Product = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {products.data?.map((item: unknown, index: number) => (
+                    {products.data?.map((item:TProducts, index: number) => (
                       <tr key={index}>
                         <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                           <p className="text-gray-600 whitespace-no-wrap">
@@ -352,7 +352,7 @@ export const Product = () => {
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     >
                       <option>---Select Category---</option>
-                      {category.data.map((itemC: any, index: number) => (
+                      {category.data.map((itemC: TCategories, index: number) => (
                         <option key={index} value={itemC._id}>
                           {itemC.categoryName}
                         </option>
@@ -551,7 +551,7 @@ export const Product = () => {
                       
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     >
-                      {category.data.map((itemC: any, index: number) => (
+                      {category.data.map((itemC: TCategories, index: number) => (
                         <option
                           key={index}
                           value={itemC._id}
