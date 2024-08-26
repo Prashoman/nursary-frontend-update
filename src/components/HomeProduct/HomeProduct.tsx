@@ -2,12 +2,15 @@ import { HiOutlineShoppingCart } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { useGetCategoryQuery, useGetProductQuery } from "../../redux/api/baseApi";
 import { TCategories, TProducts } from "../../helpers";
-import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../redux/cart/cartSlice";
+
 
 
 
 const HomeProduct = () =>{
-  const [selectedCategories, setSelectedCategory] = useState("");
+  // const [selectedCategories, setSelectedCategory] = useState("");
+  const dispatch = useDispatch()
   
 
 
@@ -19,13 +22,13 @@ const HomeProduct = () =>{
     
   return (
   <>
-   <section className="w-full px-4 lg:px-20 bg-white">
+   <section className="w-full px-4 py-10 lg:px-20 bg-white">
       <div>
         <h1 className=" text-center font-medium text-green-700 text-2xl ">Our Products</h1>
       </div>
         <div className="flex items-center justify-center flex-wrap gap-5 pt-4 pb-16">
           <div
-            onClick={() => setSelectedCategory(null)}
+            // onClick={() => setSelectedCategory()}
             // ${  selectedCategory === null ? categoryColor : "" }
             className={` w-[45%] lg:w-[18%] font-serif text-[14px] lg:text-xl border border-yellow-500 py-1 px-3 text-center rounded-lg cursor-pointer hover:bg-[#690213] hover:text-white`}
           >
@@ -36,7 +39,7 @@ const HomeProduct = () =>{
             category?.data?.map((cat:TCategories , index: number) => (
               <div
                 key={index}
-                onClick={() => setSelectedCategory(cat.id)}
+                // onClick={() => setSelectedCategory(cat._id)}
                 // ${ selectedCategory === cat.id ? categoryColor : ""}
                 className={` w-[45%] lg:w-[18%] font-serif text-[14px] lg:text-xl border border-yellow-500 py-1 px-3 text-center rounded-lg cursor-pointer hover:bg-[#690213] hover:text-white`}
               >
@@ -71,27 +74,24 @@ const HomeProduct = () =>{
                         <h1 className="text-[14px] lg:text-xl text-gray-800 font-serif">
                           {item.title}
                         </h1>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                        <div >
+                          <div className="flex items-center justify-between">
                             <p className="text-[12px] lg:text-[16px] font-serif">
                               ৳ {item.price}
                             </p>
-                            <del className="text-[12px] lg:text-[16px] font-serif">
-                              ৳ {item.quantity}
-                            </del>
+                            <p className="text-[12px] lg:text-[16px] font-serif">
+                            stock: {item.quantity}
+                            </p>
                             <small className="bg-[#690213] text-white font-serif rounded-xl py-1 px-2 text-xs absolute bottom-[37%] left-2">
                               {item?.categoryId?.categoryName}
                             </small>
                           </div>
                         </div>
-                        <div>
-                          <span className="bg-green-900 text-white font-serif rounded-full py-2 px-1 absolute top-3 right-2 text-[10px] lg:text-xs">
-                            {/* -{item.offer_percentage}% */}
-                          </span>
-                        </div>
+                        
                       </Link>
                       <div className="pt-2">
                         <button
+                        onClick={()=> dispatch({ type:addToCart, payload:item})}
                         //   onClick={(e) => handleAddToCart(item?.food_id, e)}
                           className="bg-[#690213] text-white py-2 px-4 rounded-full flex items-center justify-center gap-2 w-full h-10 hover:bg-gray-400 hover:text-[#690213] transition-all"
                         >
