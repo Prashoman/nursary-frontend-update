@@ -42,6 +42,14 @@ const CheckOut = () => {
     const { name, email, phone, address, paymentMethod } = data;
 
     const cart: { productId: string, quantity: number }[] = [];
+
+ const notInsert =  cartProduct.map((product)=>{
+    if(product.quantity > products?.data?.find((item)=>item._id === product._id)?.quantity){
+      toast.error("You can't add more than stock quantity");
+      return;
+    }
+  })
+
     cartProduct.map((product) => {
       cart.push({
         productId: product._id,
