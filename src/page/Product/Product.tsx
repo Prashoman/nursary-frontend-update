@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 import Modal from "../../components/Model/Modal";
 import { modelClose, modelOpen, TCategories, TProducts } from "../../helpers";
 import { toast } from "react-toastify";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 // import { GiToaster } from "react-icons/gi";
 
 type Inputs = {
@@ -79,18 +80,35 @@ export const Product = () => {
       rating,
       description,
     };
-    const insertProduct = await productInfoHandle(productInfo);
+    try {
+      const insertProduct = await productInfoHandle(productInfo);
+      console.log({insertProduct});
+      
+      if (insertProduct.data) {
+        toast.success("Product Added Successfully");
+        modelClose(productModalRef, productFormRef);
+        reset();
+      }
+      else{
+        toast.error((insertProduct.error as FetchBaseQueryError)?.data?.message);
+      }
+    } catch (error: unknown) {
+      console.log({error});
+      
+      toast.error((error as Error).message);
+    }
+    
     // console.log("insertProduct", insertProduct);
 
-    if (insertProduct) {
-      // toggleModal();
-      toast.success("Product Added Successfully");
-      modelClose(productModalRef, productFormRef);
-      reset();
+    // if (insertProduct) {
+    //   // toggleModal();
+    //   toast.success("Product Added Successfully");
+    //   modelClose(productModalRef, productFormRef);
+    //   reset();
     
-    }else{
-      toast.error("Product Added Failed");
-    }
+    // }else{
+    //   toast.error(insertProduct.error?.data?.message);
+    // }
     // console.log("productInfo", productInfo);
   };
 
@@ -151,7 +169,7 @@ export const Product = () => {
         modelClose(updateProductModalRef, updateProductFormRef);
         toast.success("Product Updated Successfully");
       } else {
-        toast.error("Product Update Failed");
+        toast.error(res.error?.data?.message);
       }
     } catch (error) {
       toast.error("Product Update Failed");

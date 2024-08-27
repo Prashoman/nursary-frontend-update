@@ -1,22 +1,27 @@
 import { Link } from "react-router-dom";
-import { useGetProductQuery } from "../../redux/api/baseApi";
+import { useCheckOutMutation, useGetProductQuery } from "../../redux/api/baseApi";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
 import { totalAmount, TProducts } from "../../helpers";
 import { toast } from "react-toastify";
 import {
+  checkOut,
   productDecrement,
   productIncrement,
   removeFromCart,
 } from "../../redux/cart/cartSlice";
 import Swal from "sweetalert2";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 const CheckOut = () => {
   const { data: products } = useGetProductQuery(undefined);
+  const dispatch = useAppDispatch();
+  const [handleCeckout] = useCheckOutMutation();
   const cartProduct = useAppSelector(
     (state: RootState) => state.cart.cart
   ) as TProducts[];
-  const dispatch = useAppDispatch();
+  const { handleSubmit, reset,register,formState: { errors } } = useForm({
+  });
 
   const handlePlus = (id: string) => {
     const mainProductQuantity: number = products?.data?.find(
@@ -31,6 +36,42 @@ const CheckOut = () => {
     }
     dispatch(productIncrement(id));
   };
+
+  const checkOuthandler:SubmitHandler<IFormInput> =async (data) => {
+    console.log(data);
+    const { name, email, phone, address, paymentMethod } = data;
+
+    const cart: { productId: string, quantity: number }[] = [];
+    cartProduct.map((product) => {
+      cart.push({
+        productId: product._id,
+        quantity: product.quantity,
+      });
+    });
+    const total = totalAmount(cartProduct) > 0 ? (totalAmount(cartProduct) + 20).toFixed(2) : 0;
+    const order = {
+      name,
+      email,
+      phone,
+      address,
+      paymentMethod,
+      total:Number(total),
+      cart,
+    };
+
+    const res = await handleCeckout(order).unwrap();
+    console.log(res);
+    
+    if (res.data) {
+      dispatch(checkOut());
+      toast.success("Order placed successfully");
+      reset();
+    }
+
+    // console.log({ order });
+    
+  }
+
   return (
     <>
       <div className="container mx-auto mt-10">
@@ -152,8 +193,9 @@ const CheckOut = () => {
             </Link>
           </div>
         </div>
+        <form onSubmit={handleSubmit(checkOuthandler)}>
         <div className="flex flex-col lg:flex-row shadow-md my-10 px-4 lg:px-10">
-          <form
+          <div
             // onSubmit={handleSubmit(profileUpdateHandle)}
             className="w-full lg:w-3/4"
           >
@@ -163,9 +205,12 @@ const CheckOut = () => {
               </label>
               <input
                 type="text"
-                // {...register("name", { required: true })}
+                {...register("name", { required: true })}
                 className="w-full text-[15px] font-sans px-3 py-2 border border-green-800 focus:outline-none rounded"
               />
+              {
+                errors.name && <span className="text-red-500">This field is required</span>
+              }
             </div>
             <div>
               <label htmlFor="email" className="text-[20px] font-medium">
@@ -173,9 +218,12 @@ const CheckOut = () => {
               </label>
               <input
                 type="email"
-                // {...register("email", { required: true })}
+                {...register("email", { required: true })}
                 className="w-full text-[15px] font-sans px-3 py-2 border border-green-800 focus:outline-none rounded"
               />
+              {
+                errors.email && <span className="text-red-500">This field is required</span>
+              }
             </div>
             <div>
               <label htmlFor="phone" className="text-[20px] font-medium">
@@ -183,26 +231,32 @@ const CheckOut = () => {
               </label>
               <input
                 type="text"
-                // {...register("phone", { required: true })}
+                {...register("phone", { required: true })}
                 className="w-full text-[15px] font-sans px-3 py-2 border border-green-800 focus:outline-none rounded"
               />
+              {
+                errors.phone && <span className="text-red-500">This field is required</span>
+              }
             </div>
             <div>
               <label htmlFor="address" className="text-[20px] font-medium">
                 Address
               </label>
               <textarea
-                // {...register("address", { required: true })}
+                {...register("address", { required: true })}
                 className="w-full text-[15px] font-sans px-3 py-2 border border-green-800 focus:outline-none rounded"
               ></textarea>
+              {
+                errors.address && <span className="text-red-500">This field is required</span>
+              }
             </div>
             <div className="flex items-center gap-2">
-              <input type="radio" id="html" name="fav_language" value="HTML" className="text-green-600 focus:ring-green-600" style={{ accentColor: '#16a34a' }} />
+              <input type="radio" id="html" {...register('paymentMethod')} value="Cash On" className="text-green-600 focus:ring-green-600" style={{ accentColor: '#16a34a' }} />
               <label htmlFor="html">Cash On Delivery</label>
-              <input type="radio" id="css" name="fav_language" value="CSS" className="text-green-600 focus:ring-green-600" style={{ accentColor: '#16a34a' }} />
+              <input type="radio" id="css" {...register('paymentMethod')} value="Cash In" className="text-green-600 focus:ring-green-600" style={{ accentColor: '#16a34a' }} />
               <label htmlFor="css">Cash In Delivery</label>
             </div>
-          </form>
+          </div>
 
           <div className="w-full lg:w-1/4 px-8 py-10">
             <h1 className="font-semibold text-2xl border-b pb-8">
@@ -231,12 +285,13 @@ const CheckOut = () => {
                   }
                 </span>
               </div>
-              <button className="bg-green-600 font-semibold hover:bg-green-900 py-3 text-sm text-white uppercase w-full">
+              <button type="submit" className="bg-green-600 font-semibold hover:bg-green-900 py-3 text-sm text-white uppercase w-full">
                 Checkout
               </button>
             </div>
           </div>
         </div>
+        </form>
       </div>
     </>
   );

@@ -108,8 +108,18 @@ export const baseApi = createApi({
         }
       },
       invalidatesTags:["Product"]
+    }),
+    checkOut:builder.mutation({
+      query:(order)=>{
+        return{
+          url:`/checkouts`,
+          method:"POST",
+          body:order	
+        }
+      },
+      invalidatesTags:["Product"]
     })
   }),
 });
 
-export const { useGetCategoryQuery, useAddCategoryMutation, useDeleteCategoryMutation, useUpdateCategoryMutation, useGetProductQuery, useAddProductMutation, useDeleteProductMutation, useProductUpdateMutation } = baseApi;
+export const { useGetCategoryQuery, useAddCategoryMutation, useDeleteCategoryMutation, useUpdateCategoryMutation, useGetProductQuery, useAddProductMutation, useDeleteProductMutation, useProductUpdateMutation, useCheckOutMutation } = baseApi;
