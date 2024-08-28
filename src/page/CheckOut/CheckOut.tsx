@@ -11,7 +11,9 @@ import {
   removeFromCart,
 } from "../../redux/cart/cartSlice";
 import Swal from "sweetalert2";
-import { SubmitHandler, useForm } from "react-hook-form";
+import {  FieldValues, useForm } from "react-hook-form";
+
+
 
 const CheckOut = () => {
   const { data: products } = useGetProductQuery(undefined);
@@ -37,19 +39,22 @@ const CheckOut = () => {
     dispatch(productIncrement(id));
   };
 
-  const checkOuthandler:SubmitHandler<IFormInput> =async (data) => {
-    console.log(data);
+  const checkOuthandler =async (data:FieldValues ) => {
+    // console.log(data);
     const { name, email, phone, address, paymentMethod } = data;
-
     const cart: { productId: string, quantity: number }[] = [];
-
  const notInsert =  cartProduct.map((product)=>{
-    if(product.quantity > products?.data?.find((item)=>item._id === product._id)?.quantity){
+    if(product.quantity > products?.data?.find((item:TProducts)=>item._id === product._id)?.quantity){
       toast.error("You can't add more than stock quantity");
-      return;
+      return true;
+    }else{
+      return false;
     }
   })
-
+  if(notInsert[0]){
+    return;
+    
+  }
     cartProduct.map((product) => {
       cart.push({
         productId: product._id,
